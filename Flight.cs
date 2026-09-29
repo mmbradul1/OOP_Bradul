@@ -104,14 +104,68 @@ namespace OOP_Bradul
             }
         }
 
+
         public double TotalRevenue
         {
             get { return PassengerCount * TicketPrice; }
         }
 
-        private bool CanAddPassenger()
+
+
+        // конструктор без параметрів
+        public Flight() : this(
+            "AB100",
+            "Kyiv",
+            DateTime.Now.AddDays(1),
+            1,
+            100,
+            FlightStatus.Scheduled,
+            false)
         {
-            return PassengerCount < MaxPassengers;
+        }
+
+
+        // конструктор з двома параметрами
+        public Flight(string flightNumber, string destination)
+            : this(
+                flightNumber,
+                destination,
+                DateTime.Now.AddDays(1),
+                1,
+                100,
+                FlightStatus.Scheduled,
+                false)
+        {
+        }
+
+
+        // повний конструктор
+        public Flight(
+            string flightNumber,
+            string destination,
+            DateTime departureTime,
+            int passengerCount,
+            double ticketPrice,
+            FlightStatus status,
+            bool isInternational)
+        {
+            FlightNumber = flightNumber;
+            Destination = destination;
+            DepartureTime = departureTime;
+            PassengerCount = passengerCount;
+            TicketPrice = ticketPrice;
+            Status = status;
+            IsInternational = isInternational;
+        }
+
+
+
+
+
+        private bool CanAddPassenger(int count)
+        {
+            return count > 0 &&
+                   PassengerCount + count <= MaxPassengers;
         }
 
         private bool CanStartBoarding()
@@ -125,13 +179,28 @@ namespace OOP_Bradul
         {
             return minutes > 0 && minutes <= 1400;
         }
+
+
+
+
         public bool AddPassenger()
         {
-            if (!CanAddPassenger()) { return false; }
-            PassengerCount++;
+            return AddPassenger(1);
+        }
+
+        public bool AddPassenger(int count)
+        {
+            if (!CanAddPassenger(count))
+            {
+                return false;
+            }
+
+            PassengerCount += count;
             return true;
         }
         
+
+
         public void DelayFlight(int minutes)
         {
             if (!IsValidDelay(minutes)) { throw new Exception("Delay must be 1 to 1440 minutes"); }

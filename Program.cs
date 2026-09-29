@@ -40,54 +40,83 @@ namespace OOP_Bradul
                         {
                             if (flights.Count >= maxFlights) { Console.WriteLine("Flight limit reached."); break; }
 
-                            Flight newFlight = new Flight();
-                            while (true)
+                            Console.WriteLine("Choose constructor:");
+                            Console.WriteLine("1. Flight()");
+                            Console.WriteLine("2. Flight(string flightNumber, string destination)");
+                            Console.WriteLine("3. Flight(full parameters)");
+                            Console.Write("Choose an option: ");
+
+                            if (!int.TryParse(Console.ReadLine(), out int constructorChoice) || constructorChoice < 1 || constructorChoice > 3) { Console.WriteLine("Choose a number 1 to 3.."); break; }
+
+                            Flight newFlight;
+
+                            // конструктор без параметрів
+
+                            if (constructorChoice == 1)
+                            {
+                                newFlight = new Flight();
+                                Console.WriteLine("Used constructor: Flight()");
+                            }
+
+                            // конструктор з двома параметрами
+                            else if (constructorChoice == 2)
                             {
                                 Console.Write("Enter flight number: ");
-
-                                try { newFlight.FlightNumber = Console.ReadLine(); break; }
-                                catch (Exception ex) { Console.WriteLine(ex.Message); }
+                                string flightNumber = Console.ReadLine();
+                                Console.Write("Enter destination: ");
+                                string destination = Console.ReadLine();
+                                try
+                                {
+                                    newFlight = new Flight(
+                                        flightNumber,
+                                        destination);
+                                    Console.WriteLine("Used constructor: Flight(string, string)");
+                                }
+                                catch (Exception ex) { Console.WriteLine(ex.Message); break; }
                             }
 
-                            while (true)
+                            // конструктор повний
+                            else
                             {
-                                Console.WriteLine("Enter destination: ");
-                                try { newFlight.Destination = Console.ReadLine(); break; }
-                                catch (Exception ex) { Console.WriteLine(ex.Message); }
-                            }
+                                Console.Write("Enter flight number: ");
+                                string flightNumber = Console.ReadLine();
 
-                            while (true)
-                            {
-                                Console.WriteLine("Enter departure date and time (dd.MM.yyyy HH:mm): ");
-                                string input = Console.ReadLine();
-                                if (!DateTime.TryParseExact(
-                                    input,
-                                    "dd.MM.yyyy HH:mm",
-                                    CultureInfo.InvariantCulture,
-                                    DateTimeStyles.None,
-                                    out DateTime departureTime)) { Console.WriteLine("Use the right format."); continue; }
-                                try { newFlight.DepartureTime = departureTime; break; }
-                                catch (Exception ex) { Console.WriteLine(ex.Message); }
-                            }
+                                Console.Write("Enter destination: ");
+                                string destination = Console.ReadLine();
 
-                            while (true)
-                            {
-                                Console.WriteLine("Enter passenger count: ");
-                                if (!int.TryParse(Console.ReadLine(), out int passengerCount)) { Console.WriteLine("Enter a whole number."); continue; }
-                                try { newFlight.PassengerCount = passengerCount; break; }
-                                catch (Exception ex) { Console.WriteLine(ex.Message); }
-                            }
 
-                            while (true)
-                            {
-                                Console.WriteLine("Enter ticket price: ");
-                                if (!double.TryParse(Console.ReadLine(), out double ticketPrice)) { Console.WriteLine("Enter a number."); continue; }
-                                try { newFlight.TicketPrice = ticketPrice; break; }
-                                catch (Exception ex) { Console.WriteLine(ex.Message); }
-                            }
+                                DateTime departureTime;
 
-                            while (true)
-                            {
+
+                                while (true)
+                                {
+                                    Console.WriteLine("Enter departure date and time (dd.MM.yyyy HH:mm): ");
+                                    if (DateTime.TryParseExact(
+                                        Console.ReadLine(),
+                                        "dd.MM.yyyy HH:mm",
+                                        CultureInfo.InvariantCulture,
+                                        DateTimeStyles.None,
+                                        out departureTime)) { break; }
+                                    Console.WriteLine("Use the right format.");
+                                }
+
+                                int passengerCount;
+                                while (true)
+                                {
+                                    Console.WriteLine("Enter passenger count: ");
+                                    if (int.TryParse(Console.ReadLine(), out passengerCount)) { break; }
+                                    Console.WriteLine("Enter a whole number.");
+                                }
+
+                                double ticketPrice;
+                                while (true)
+                                {
+                                    Console.WriteLine("Enter ticket price: ");
+                                    if (double.TryParse(Console.ReadLine(), out ticketPrice)) { break; }
+                                    Console.WriteLine("Enter a number.");
+                                }
+
+
                                 Console.WriteLine("1. Scheduled");
                                 Console.WriteLine("2. Boarding");
                                 Console.WriteLine("3. Delayed");
@@ -95,24 +124,37 @@ namespace OOP_Bradul
                                 Console.WriteLine("5. Cancelled");
                                 Console.WriteLine("6. Landed");
                                 Console.Write("Choose the flight status: ");
-                                if (!int.TryParse(Console.ReadLine(), out int statusChoice)) { Console.WriteLine("Enter a number."); continue; }
-                                try { newFlight.Status = (FlightStatus)(statusChoice - 1); break; }
-                                catch (Exception ex) { Console.WriteLine(ex.Message); }
-                            }
+                                if (!int.TryParse(Console.ReadLine(), out int statusChoice)) { Console.WriteLine("Enter a number."); break; }
+                                FlightStatus status = (FlightStatus)(statusChoice - 1);
 
-                            while (true)
-                            {
-                                Console.WriteLine("Is the flight international (y/n)?: ");
-                                string answer = Console.ReadLine().ToLower();
-                                if (answer == "y") { newFlight.IsInternational = true; break; }
-                                if (answer == "n") { newFlight.IsInternational = false; break; }
-                                Console.WriteLine("Enter y or n");
-                            }
 
+                                bool isInternational;
+                                while (true)
+                                {
+                                    Console.WriteLine("Is the flight international (y/n)?: ");
+                                    string answer = Console.ReadLine().ToLower();
+                                    if (answer == "y") { isInternational = true; break; }
+                                    if (answer == "n") { isInternational = false; break; }
+                                    Console.WriteLine("Enter y or n");
+                                }
+
+                                try
+                                {
+                                    newFlight = new Flight(
+                                        flightNumber,
+                                        destination,
+                                        departureTime,
+                                        passengerCount,
+                                        ticketPrice,
+                                        status,
+                                        isInternational);
+                                    Console.WriteLine("Used constructor: Flight(full parameters)");
+                                }
+                                catch (Exception ex) { Console.WriteLine(ex.Message); break; }
+                            }
                             flights.Add(newFlight);
                             Console.WriteLine("Flight added");
                             break;
-
                         }
 
                     case 2:
@@ -132,6 +174,7 @@ namespace OOP_Bradul
                                 Console.WriteLine($"Departure time: {flight.DepartureTime:dd.MM.yyyy HH:mm}");
                                 Console.WriteLine($"Passengers: {flight.PassengerCount}");
                                 Console.WriteLine($"Ticket price: {flight.TicketPrice}");
+                                Console.WriteLine($"Total revenue: {flight.TotalRevenue}");
                                 Console.WriteLine($"Status: {flight.Status}");
                                 Console.WriteLine($"Type: {flightType}");
                             }
@@ -204,6 +247,7 @@ namespace OOP_Bradul
                             if (!int.TryParse(Console.ReadLine(), out int flightChoice) || flightChoice < 1 || flightChoice > flights.Count) { Console.WriteLine("Invalid flight number."); break; }
 
                             Flight selectedFlight = flights[flightChoice - 1];
+
                             Console.WriteLine();
                             Console.WriteLine("Choose behavior:");
                             Console.WriteLine("1. Add passenger");
@@ -219,16 +263,66 @@ namespace OOP_Bradul
                             {
                                 case 1:
                                     {
-                                        bool passengerAdded = selectedFlight.AddPassenger();
+                                        Console.WriteLine("Add passenger:");
+                                        Console.WriteLine("1. Add one passenger");
+                                        Console.WriteLine("2. Add several passengers");
+                                        Console.Write("Choose an option: ");
 
-                                        if (passengerAdded)
+                                        if (!int.TryParse(Console.ReadLine(), out int addChoice) ||
+                                            addChoice < 1 || addChoice > 2)
                                         {
-                                            Console.WriteLine("Passenger added.");
-                                            Console.WriteLine($"Passengers: {selectedFlight.PassengerCount}");
+                                            Console.WriteLine("Choose 1 or 2.");
+                                            break;
+                                        }
+
+                                        if (addChoice == 1)
+                                        {
+                                            bool passengerAdded =
+                                                selectedFlight.AddPassenger();
+
+                                            if (passengerAdded)
+                                            {
+                                                Console.WriteLine("Passenger added.");
+                                                Console.WriteLine(
+                                                    $"Passengers: {selectedFlight.PassengerCount}");
+                                            }
+                                            else
+                                            {
+                                                Console.WriteLine(
+                                                    "Cannot add passenger. Maximum is 500.");
+                                            }
                                         }
                                         else
                                         {
-                                            Console.WriteLine("Cannot add passenger. Maximum is 500.");
+                                            while (true)
+                                            {
+                                                Console.Write("Enter number of passengers to add: ");
+
+                                                if (!int.TryParse(
+                                                    Console.ReadLine(),
+                                                    out int count))
+                                                {
+                                                    Console.WriteLine("Enter a whole number.");
+                                                    continue;
+                                                }
+
+                                                bool passengersAdded =
+                                                    selectedFlight.AddPassenger(count);
+
+                                                if (passengersAdded)
+                                                {
+                                                    Console.WriteLine(
+                                                        $"{count} passengers added.");
+
+                                                    Console.WriteLine(
+                                                        $"Passengers: {selectedFlight.PassengerCount}");
+
+                                                    break;
+                                                }
+
+                                                Console.WriteLine(
+                                                    "Cannot add this number of passengers. Try again.");
+                                            }
                                         }
 
                                         break;
