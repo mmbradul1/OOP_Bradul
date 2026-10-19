@@ -26,6 +26,7 @@ namespace OOP_Bradul
                 Console.WriteLine("3. Find flight");
                 Console.WriteLine("4. Demonstrate behavior");
                 Console.WriteLine("5. Delete flight");
+                Console.WriteLine("6. Demonstrate static methods");
                 Console.WriteLine("0. Exit");
                 Console.Write("Choose an option: ");
 
@@ -38,127 +39,288 @@ namespace OOP_Bradul
                 {
                     case 1:
                         {
-                            if (flights.Count >= maxFlights) { Console.WriteLine("Flight limit reached."); break; }
-
+                            if (flights.Count >= maxFlights)
+                            {
+                                Console.WriteLine("Flight limit reached.");
+                                break;
+                            }
+                            Console.WriteLine();
                             Console.WriteLine("Choose constructor:");
                             Console.WriteLine("1. Flight()");
                             Console.WriteLine("2. Flight(string flightNumber, string destination)");
                             Console.WriteLine("3. Flight(full parameters)");
-                            Console.Write("Choose an option: ");
+                            Console.WriteLine("4. Create flight from string (TryParse)");
 
-                            if (!int.TryParse(Console.ReadLine(), out int constructorChoice) || constructorChoice < 1 || constructorChoice > 3) { Console.WriteLine("Choose a number 1 to 3.."); break; }
+                            int constructorChoice;
+
+                            while (true)
+                            {
+                                Console.Write("Choose an option: ");
+
+                                if (int.TryParse(Console.ReadLine(), out constructorChoice)
+                                    && constructorChoice >= 1 && constructorChoice <= 4)
+                                {
+                                    break;
+                                }
+
+                                Console.WriteLine("Choose a number from 1 to 4.");
+                            }
 
                             Flight newFlight;
 
-                            // конструктор без параметрів
-
+                            // Конструктор без параметрів
                             if (constructorChoice == 1)
                             {
                                 newFlight = new Flight();
                                 Console.WriteLine("Used constructor: Flight()");
                             }
 
-                            // конструктор з двома параметрами
-                            else if (constructorChoice == 2)
+                            else if (constructorChoice == 4)
                             {
-                                Console.Write("Enter flight number: ");
-                                string flightNumber = Console.ReadLine();
-                                Console.Write("Enter destination: ");
-                                string destination = Console.ReadLine();
-                                try
+                                while (true)
                                 {
-                                    newFlight = new Flight(
-                                        flightNumber,
-                                        destination);
-                                    Console.WriteLine("Used constructor: Flight(string, string)");
+                                    Console.WriteLine("Enter flight data:");
+                                    Console.WriteLine("Format: Number,Destination,Date,Passengers,Price,Status,International");
+                                    Console.Write("Input: ");
+
+                                    string input = Console.ReadLine() ?? "";
+
+                                    if (Flight.TryParse(input, out Flight parsedFlight))
+                                    {
+                                        newFlight = parsedFlight;
+                                        Console.WriteLine("Used method: Flight.TryParse()");
+                                        break;
+                                    }
+
+                                    Console.WriteLine("Try again.");
                                 }
-                                catch (Exception ex) { Console.WriteLine(ex.Message); break; }
                             }
 
-                            // конструктор повний
                             else
                             {
-                                Console.Write("Enter flight number: ");
-                                string flightNumber = Console.ReadLine();
-
-                                Console.Write("Enter destination: ");
-                                string destination = Console.ReadLine();
-
-
-                                DateTime departureTime;
-
+                                // Введення номера рейсу
+                                string flightNumber;
 
                                 while (true)
                                 {
-                                    Console.WriteLine("Enter departure date and time (dd.MM.yyyy HH:mm): ");
-                                    if (DateTime.TryParseExact(
-                                        Console.ReadLine(),
-                                        "dd.MM.yyyy HH:mm",
-                                        CultureInfo.InvariantCulture,
-                                        DateTimeStyles.None,
-                                        out departureTime)) { break; }
-                                    Console.WriteLine("Use the right format.");
+                                    Console.Write("Enter flight number: ");
+                                    flightNumber = (Console.ReadLine() ?? "").Trim();
+
+                                    if (flightNumber.Length < 2 || flightNumber.Length > 7)
+                                    {
+                                        Console.WriteLine("Must contain 2 to 7 characters.");
+                                        continue;
+                                    }
+
+                                    bool isValid = true;
+
+                                    foreach (char symbol in flightNumber)
+                                    {
+                                        if (!char.IsLetterOrDigit(symbol))
+                                        {
+                                            isValid = false;
+                                            break;
+                                        }
+                                    }
+
+                                    if (!isValid)
+                                    {
+                                        Console.WriteLine("Can contain only letters and digits.");
+                                        continue;
+                                    }
+
+                                    break;
                                 }
 
-                                int passengerCount;
+                                // Введення міста призначення
+                                string destination;
+
                                 while (true)
                                 {
-                                    Console.WriteLine("Enter passenger count: ");
-                                    if (int.TryParse(Console.ReadLine(), out passengerCount)) { break; }
-                                    Console.WriteLine("Enter a whole number.");
+                                    Console.Write("Enter destination: ");
+                                    destination = (Console.ReadLine() ?? "").Trim();
+
+                                    if (string.IsNullOrWhiteSpace(destination))
+                                    {
+                                        Console.WriteLine("Destination cannot be empty.");
+                                        continue;
+                                    }
+
+                                    bool isValid = true;
+
+                                    foreach (char symbol in destination)
+                                    {
+                                        if (!char.IsLetter(symbol) && symbol != ' ')
+                                        {
+                                            isValid = false;
+                                            break;
+                                        }
+                                    }
+
+                                    if (!isValid)
+                                    {
+                                        Console.WriteLine("Can contain only letters and spaces.");
+                                        continue;
+                                    }
+
+                                    break;
                                 }
 
-                                double ticketPrice;
-                                while (true)
+                                // Конструктор з двома параметрами
+                                if (constructorChoice == 2)
                                 {
-                                    Console.WriteLine("Enter ticket price: ");
-                                    if (double.TryParse(Console.ReadLine(), out ticketPrice)) { break; }
-                                    Console.WriteLine("Enter a number.");
+                                    try
+                                    {
+                                        newFlight = new Flight(flightNumber, destination);
+                                        Console.WriteLine("Used constructor: Flight(string, string)");
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine(ex.Message);
+                                        break;
+                                    }
                                 }
 
-
-                                Console.WriteLine("1. Scheduled");
-                                Console.WriteLine("2. Boarding");
-                                Console.WriteLine("3. Delayed");
-                                Console.WriteLine("4. Departed");
-                                Console.WriteLine("5. Cancelled");
-                                Console.WriteLine("6. Landed");
-                                Console.Write("Choose the flight status: ");
-                                if (!int.TryParse(Console.ReadLine(), out int statusChoice)) { Console.WriteLine("Enter a number."); break; }
-                                FlightStatus status = (FlightStatus)(statusChoice - 1);
-
-
-                                bool isInternational;
-                                while (true)
+                                // Повний конструктор
+                                else
                                 {
-                                    Console.WriteLine("Is the flight international (y/n)?: ");
-                                    string answer = Console.ReadLine().ToLower();
-                                    if (answer == "y") { isInternational = true; break; }
-                                    if (answer == "n") { isInternational = false; break; }
-                                    Console.WriteLine("Enter y or n");
-                                }
+                                    DateTime departureTime;
 
-                                try
-                                {
-                                    newFlight = new Flight(
-                                        flightNumber,
-                                        destination,
-                                        departureTime,
-                                        passengerCount,
-                                        ticketPrice,
-                                        status,
-                                        isInternational);
-                                    Console.WriteLine("Used constructor: Flight(full parameters)");
+                                    while (true)
+                                    {
+                                        Console.Write("Enter departure date and time (dd.MM.yyyy HH:mm): ");
+
+                                        if (!DateTime.TryParseExact(
+                                            Console.ReadLine(),
+                                            "dd.MM.yyyy HH:mm",
+                                            CultureInfo.InvariantCulture,
+                                            DateTimeStyles.None,
+                                            out departureTime))
+                                        {
+                                            Console.WriteLine("Use the right date and time format.");
+                                            continue;
+                                        }
+
+                                        if (departureTime <= DateTime.Now)
+                                        {
+                                            Console.WriteLine("Departure time must be in the future.");
+                                            continue;
+                                        }
+
+                                        break;
+                                    }
+
+                                    int passengerCount;
+
+                                    while (true)
+                                    {
+                                        Console.Write("Enter passenger count: ");
+
+                                        if (int.TryParse(Console.ReadLine(), out passengerCount)
+                                            && passengerCount >= 1
+                                            && passengerCount <= 500)
+                                        {
+                                            break;
+                                        }
+
+                                        Console.WriteLine("Passenger count must be 1 to 500.");
+                                    }
+
+                                    double ticketPrice;
+
+                                    while (true)
+                                    {
+                                        Console.Write("Enter ticket price: ");
+
+                                        if (double.TryParse(Console.ReadLine(), out ticketPrice)
+                                            && double.IsFinite(ticketPrice)
+                                            && ticketPrice > 0
+                                            && ticketPrice <= 10000)
+                                        {
+                                            break;
+                                        }
+
+                                        Console.WriteLine("Ticket price must be greater than 0 and not more than 10000.");
+                                    }
+
+                                    Console.WriteLine("1. Scheduled");
+                                    Console.WriteLine("2. Boarding");
+                                    Console.WriteLine("3. Delayed");
+                                    Console.WriteLine("4. Departed");
+                                    Console.WriteLine("5. Cancelled");
+                                    Console.WriteLine("6. Landed");
+
+                                    int statusChoice;
+
+                                    while (true)
+                                    {
+                                        Console.Write("Choose the flight status: ");
+
+                                        if (int.TryParse(Console.ReadLine(), out statusChoice)
+                                            && statusChoice >= 1
+                                            && statusChoice <= 6)
+                                        {
+                                            break;
+                                        }
+
+                                        Console.WriteLine("Choose a number from 1 to 6.");
+                                    }
+
+                                    FlightStatus status = (FlightStatus)(statusChoice - 1);
+
+                                    bool isInternational;
+
+                                    while (true)
+                                    {
+                                        Console.Write("Is the flight international (y/n)?: ");
+                                        string answer = (Console.ReadLine() ?? "").Trim().ToLower();
+
+                                        if (answer == "y")
+                                        {
+                                            isInternational = true;
+                                            break;
+                                        }
+
+                                        if (answer == "n")
+                                        {
+                                            isInternational = false;
+                                            break;
+                                        }
+
+                                        Console.WriteLine("Enter y or n.");
+                                    }
+
+                                    try
+                                    {
+                                        newFlight = new Flight(
+                                            flightNumber,
+                                            destination,
+                                            departureTime,
+                                            passengerCount,
+                                            ticketPrice,
+                                            status,
+                                            isInternational);
+
+                                        Console.WriteLine("Used constructor: Flight(full parameters)");
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine(ex.Message);
+                                        break;
+                                    }
                                 }
-                                catch (Exception ex) { Console.WriteLine(ex.Message); break; }
                             }
+
                             flights.Add(newFlight);
-                            Console.WriteLine("Flight added");
+                            Console.WriteLine();
+                            Console.WriteLine("Flight added.");
                             break;
                         }
 
                     case 2:
                         {
+                            Console.WriteLine();
+                            Console.WriteLine($"Total flights: {Flight.FlightCount}"); 
                             if (flights.Count == 0) { Console.WriteLine("No flights has found."); break; }
                             for (int i = 0; i < flights.Count; i++)
                             {
@@ -177,6 +339,7 @@ namespace OOP_Bradul
                                 Console.WriteLine($"Total revenue: {flight.TotalRevenue}");
                                 Console.WriteLine($"Status: {flight.Status}");
                                 Console.WriteLine($"Type: {flightType}");
+                                Console.WriteLine($"String representation: {flight.ToString()}"); 
                             }
                             break;
                         }
@@ -393,7 +556,7 @@ namespace OOP_Bradul
                                 Console.WriteLine("No flights.");
                                 break;
                             }
-
+                            Console.WriteLine();
                             Console.WriteLine("Delete by:");
                             Console.WriteLine("1. Number in the list");
                             Console.WriteLine("2. Destination");
@@ -421,9 +584,10 @@ namespace OOP_Bradul
                                     Console.WriteLine("Invalid flight number.");
                                     break;
                                 }
-
-                                flights.RemoveAt(flightNumber - 1);
-
+                                
+                                flights[flightNumber - 1].MarkAsRemoved(); // оновлює лічильник
+                                flights.RemoveAt(flightNumber - 1); // прибирає рейс з списку
+                                Console.WriteLine();
                                 Console.WriteLine("Flight deleted.");
                             }
                             else if (deleteChoice == 2)
@@ -447,6 +611,8 @@ namespace OOP_Bradul
                                 {
                                     if (flights[i].Destination == destinationToDelete)
                                     {
+                                       
+                                        flights[i].MarkAsRemoved();
                                         flights.RemoveAt(i);
                                         deletedCount++;
                                     }
@@ -469,7 +635,63 @@ namespace OOP_Bradul
                             break;
                         }
 
+                    case 6: // lab4
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("Static members of Flight class:");
+
+                            Console.WriteLine($"Flight count: {Flight.FlightCount}");
+                            Console.WriteLine($"Airport name: {Flight.AirportName}");
+
+                            Console.WriteLine();
+                            Console.WriteLine(Flight.GetAirportInfo());
+
+                            Console.WriteLine();
+                            string answer;
+
+                            while (true)
+                            {
+                                Console.Write("Do you want to change the airport name? (y/n): ");
+                                answer = (Console.ReadLine() ?? "").Trim().ToLower();
+
+                                if (answer == "y" || answer == "n")
+                                {
+                                    break;
+                                }
+
+                                Console.WriteLine("Enter y or n.");
+                            }
+
+                            if (answer == "y")
+                            {
+                                while (true)
+                                {
+                                    Console.Write("Enter new airport name: ");
+                                    string newName = Console.ReadLine() ?? "";
+
+                                    try
+                                    {
+                                        // За вибором користувача:
+                                        Flight.AirportName = newName;
+                                        Console.WriteLine();
+                                        Console.WriteLine("Airport name changed.");
+                                        break;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine(ex.Message);
+                                    }
+                                }
+
+                                Console.WriteLine();
+                                Console.WriteLine(Flight.GetAirportInfo());
+                            }
+
+                            break;
+                        }
+
                     case 0:
+                        Console.WriteLine();
                         Console.WriteLine("Program finished.");
                         return;
 
