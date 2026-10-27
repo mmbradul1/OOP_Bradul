@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("OOP_Bradul.Tests")]
+
 namespace OOP_Bradul
 {
     internal class Flight
