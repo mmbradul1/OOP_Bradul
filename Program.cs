@@ -8,7 +8,8 @@ namespace OOP_Bradul
     {
         static void Main(string[] args)
         {
-            List<Flight> flights = new List<Flight>();
+            FlightManager manager = new FlightManager();
+            IReadOnlyList<Flight> flights = manager.GetAll();
 
             int maxFlights;
             while (true)
@@ -311,9 +312,16 @@ namespace OOP_Bradul
                                 }
                             }
 
-                            flights.Add(newFlight);
-                            Console.WriteLine();
-                            Console.WriteLine("Flight added.");
+                            if (manager.AddFlight(newFlight))
+                            {
+                                Console.WriteLine();
+                                Console.WriteLine("Flight added.");
+                            }
+                            else
+                            {
+                                newFlight.MarkAsRemoved();
+                                Console.WriteLine("Could not add flight.");
+                            }
                             break;
                         }
 
@@ -360,22 +368,17 @@ namespace OOP_Bradul
 
                             if (string.IsNullOrWhiteSpace(searchValue)) { Console.WriteLine("Search value cannot be empty."); break; }
 
-                            List<Flight> foundFlights = new List<Flight>();
+                            List<Flight> foundFlights;
 
-                            foreach (Flight flight in flights)
+                            if (searchChoice == 1)
                             {
-                                if (searchChoice == 1)
-                                {
-                                    if (flight.FlightNumber == searchValue.ToUpper()) { foundFlights.Add(flight); }
-                                }
+                                Flight? foundFlight = manager.FindByNumber(searchValue);
 
-                                if (searchChoice == 2)
-                                {
-                                    string formattedDestination = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(searchValue.ToLower());
-                                    if (flight.Destination == formattedDestination) { foundFlights.Add(flight); }
-                                }
-                                
+                                foundFlights = new List<Flight>();
+
+                                if (foundFlight != null) { foundFlights.Add(foundFlight); }
                             }
+                            else { foundFlights = manager.FindByDestination(searchValue); }
 
                             if (foundFlights.Count == 0) { Console.WriteLine("No flights has found."); break; }
                             Console.WriteLine($"Found flights: {foundFlights.Count}");
@@ -584,9 +587,8 @@ namespace OOP_Bradul
                                     Console.WriteLine("Invalid flight number.");
                                     break;
                                 }
-                                
-                                flights[flightNumber - 1].MarkAsRemoved(); // оновлює лічильник
-                                flights.RemoveAt(flightNumber - 1); // прибирає рейс з списку
+
+                                manager.RemoveAt(flightNumber - 1);
                                 Console.WriteLine();
                                 Console.WriteLine("Flight deleted.");
                             }
@@ -601,41 +603,20 @@ namespace OOP_Bradul
                                     break;
                                 }
 
-                                destinationToDelete =
-                                    CultureInfo.CurrentCulture.TextInfo
-                                    .ToTitleCase(destinationToDelete.ToLower());
+                                int deletedCount = manager.RemoveByDestination(destinationToDelete);
 
-                                int deletedCount = 0;
-
-                                for (int i = flights.Count - 1; i >= 0; i--)
-                                {
-                                    if (flights[i].Destination == destinationToDelete)
-                                    {
-                                       
-                                        flights[i].MarkAsRemoved();
-                                        flights.RemoveAt(i);
-                                        deletedCount++;
-                                    }
-                                }
-
-                                if (deletedCount == 0)
-                                {
-                                    Console.WriteLine("No flights found.");
-                                }
-                                else
-                                {
-                                    Console.WriteLine($"Deleted flights: {deletedCount}");
-                                }
+                                if (deletedCount == 0) { Console.WriteLine("No flights found."); }
+                               
+                                else { Console.WriteLine($"Deleted flights: {deletedCount}"); }
+                                
                             }
-                            else
-                            {
-                                Console.WriteLine("Choose 1 or 2.");
-                            }
+                            else { Console.WriteLine("Choose 1 or 2."); }
+                            
 
                             break;
                         }
 
-                    case 6: // lab4
+                    case 6: 
                         {
                             Console.WriteLine();
                             Console.WriteLine("Static members of Flight class:");
