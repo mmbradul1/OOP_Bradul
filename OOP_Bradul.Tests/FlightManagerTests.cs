@@ -223,4 +223,50 @@ public sealed class FlightManagerTests
     {
         manager.AddFlight(CreateFlight());
     }
+
+    // Lab-7
+    [TestMethod]
+    public void Clear_EmptyCollection_ReturnsZero()
+    {
+        int countBefore = Flight.FlightCount;
+
+        int removed = manager.Clear();
+
+        Assert.AreEqual(0, removed);
+        Assert.AreEqual(0, manager.Count);
+        Assert.AreEqual(countBefore, Flight.FlightCount);
+    }
+
+    [TestMethod]
+    public void Clear_TwoFlights_RemovesAll()
+    {
+      
+        manager.AddFlight(CreateFlight("Berlin"));
+        manager.AddFlight(CreateFlight("Paris"));
+
+        int countBefore = Flight.FlightCount;
+
+
+        int removed = manager.Clear();
+        Assert.AreEqual(2, removed);
+        Assert.AreEqual(0, manager.Count);
+        Assert.AreEqual(countBefore - 2, Flight.FlightCount);
+    }
+
+    [TestMethod]
+    public void Clear_CalledTwice_DoesNotDecreaseCountAgain()
+    {
+        manager.AddFlight(CreateFlight());
+
+        int countBefore = Flight.FlightCount;
+
+        int firstResult = manager.Clear();
+        int secondResult = manager.Clear();
+
+        Assert.AreEqual(1, firstResult);
+        Assert.AreEqual(0, secondResult);
+        Assert.AreEqual(0, manager.Count);
+        Assert.AreEqual(countBefore - 1, Flight.FlightCount);
+    }
+
 }

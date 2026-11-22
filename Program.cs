@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic; 
 using System.Globalization;
+using System.IO;
 
 namespace OOP_Bradul
 {
@@ -28,6 +29,9 @@ namespace OOP_Bradul
                 Console.WriteLine("4. Demonstrate behavior");
                 Console.WriteLine("5. Delete flight");
                 Console.WriteLine("6. Demonstrate static methods");
+                Console.WriteLine("7. Save flights to file");
+                Console.WriteLine("8. Load flights from file");
+                Console.WriteLine("9. Clear flight collection");
                 Console.WriteLine("0. Exit");
                 Console.Write("Choose an option: ");
 
@@ -670,6 +674,163 @@ namespace OOP_Bradul
 
                             break;
                         }
+
+
+                    case 7:
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("Save flights to file:");
+                            Console.WriteLine("1. CSV");
+                            Console.WriteLine("2. JSON");
+                            Console.Write("Choose format: ");
+
+                            if (!int.TryParse(Console.ReadLine(), out int formatChoice)
+                                || formatChoice < 1 || formatChoice > 2)
+                            {
+                                Console.WriteLine("Choose 1 or 2.");
+                                break;
+                            }
+
+                            string path = formatChoice == 1
+                                ? "flights.csv"
+                                : "flights.json";
+
+                            try
+                            {
+                                if (formatChoice == 1)
+                                {
+                                    FlightFileService.SaveCsv(flights, path);
+                                }
+                                else
+                                {
+                                    FlightFileService.SaveJson(flights, path);
+                                }
+                                Console.WriteLine();
+                                Console.WriteLine("Flights saved successfully.");
+                                Console.WriteLine($"File: {Path.GetFullPath(path)}");
+                            }
+                            catch (IOException ex)
+                            {
+                                Console.WriteLine($"File error: {ex.Message}");
+                            }
+                            catch (UnauthorizedAccessException ex)
+                            {
+                                Console.WriteLine($"Access denied: {ex.Message}");
+                            }
+
+                            break;
+                        }
+
+                    case 8:
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("Load flights from file:");
+                            Console.WriteLine("1. CSV");
+                            Console.WriteLine("2. JSON");
+                            Console.Write("Choose format: ");
+
+                            if (!int.TryParse(Console.ReadLine(), out int formatChoice)
+                                || formatChoice < 1 || formatChoice > 2)
+                            {
+                                Console.WriteLine("Choose 1 or 2.");
+                                break;
+                            }
+
+                            string path = formatChoice == 1
+                                ? "flights.csv"
+                                : "flights.json";
+
+                            try
+                            {
+                                List<Flight> loadedFlights;
+
+                                if (formatChoice == 1)
+                                {
+                                    loadedFlights = FlightFileService.LoadCsv(path);
+                                }
+                                else
+                                {
+                                    loadedFlights = FlightFileService.LoadJson(path);
+                                }
+
+                                int addedCount = 0;
+                                int skippedCount = 0;
+
+                                foreach (Flight flight in loadedFlights)
+                                {
+                                    if (manager.Count < maxFlights &&
+                                        manager.AddFlight(flight))
+                                    {
+                                        addedCount++;
+                                    }
+                                    else
+                                    {
+                                        flight.MarkAsRemoved();
+                                        skippedCount++;
+                                    }
+                                }
+                                Console.WriteLine();
+                                Console.WriteLine($"Loaded flights: {addedCount}");
+                                Console.WriteLine($"Skipped flights: {skippedCount}");
+                                Console.WriteLine($"Total flights: {manager.Count}");
+                            }
+                            catch (IOException ex)
+                            {
+                                Console.WriteLine($"File error: {ex.Message}");
+                            }
+                            catch (UnauthorizedAccessException ex)
+                            {
+                                Console.WriteLine($"Access denied: {ex.Message}");
+                            }
+                            catch (FormatException ex)
+                            {
+                                Console.WriteLine($"Invalid data: {ex.Message}");
+                            }
+                            catch (System.Text.Json.JsonException ex)
+                            {
+                                Console.WriteLine($"Invalid JSON: {ex.Message}");
+                            }
+
+                            break;
+                        }
+
+
+                    case 9:
+                        {
+                            Console.WriteLine();
+
+                            if (manager.Count == 0)
+                            {
+                                Console.WriteLine("No flights to clear.");
+                                break;
+                            }
+
+                            Console.WriteLine($"Flights in collection: {manager.Count}");
+                            Console.Write("Are you sure you want to clear all flights? (y/n): ");
+
+                            string answer = (Console.ReadLine() ?? "").Trim().ToLower();
+
+                            if (answer == "y")
+                            {
+                                int removedCount = manager.Clear();
+                                Console.WriteLine();
+                                Console.WriteLine($"Deleted flights: {removedCount}");
+                                Console.WriteLine($"Remaining flights: {manager.Count}");
+                            }
+                            else if (answer == "n")
+                            {
+                                Console.WriteLine();
+                                Console.WriteLine("Clearing cancelled.");
+                            }
+                            else
+                            {
+                                Console.WriteLine();
+                                Console.WriteLine("Invalid answer. Clearing cancelled.");
+                            }
+
+                            break;
+                        }
+
 
                     case 0:
                         Console.WriteLine();

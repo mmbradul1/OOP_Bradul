@@ -76,4 +76,19 @@ internal class FlightManager
 
         return found.Count;
     }
+
+    public int Clear()
+    {
+        int removedCount = flights.Count;
+
+        foreach (Flight flight in flights)
+        {
+            flight.MarkAsRemoved();
+        }
+
+        flights.Clear();
+
+        return removedCount;
+    }
+
 }
